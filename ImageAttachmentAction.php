@@ -2,7 +2,9 @@
 /**
  * Action to handle calls from ImageAttachmentWidget,
  * and apply changes to model with ImageAttachmentBehavior
+ *
  * @example
+ *
  *    public function actions()
  *    {
  *        return array(
@@ -11,6 +13,7 @@
  *    }
  *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
+ *
  */
 class ImageAttachmentAction extends CAction
 {

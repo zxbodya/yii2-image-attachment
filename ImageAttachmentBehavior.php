@@ -19,7 +19,9 @@
  *              )
  *          )
  *      )
+ *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
+ *
  */
 class ImageAttachmentBehavior extends CActiveRecordBehavior
 {
@@ -64,6 +66,14 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
      *  );
      */
     public $versions;
+
+    /**
+     * name of query param for modification time hash
+     * to avoid using outdated version from cache - set it to false
+     * @var string
+     */
+    public $timeHash = '_';
+
     private $_imageId;
 
     /**
@@ -72,9 +82,10 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
     public function attach($owner)
     {
         parent::attach($owner);
-
-        $this->versions['original'] = array();
-        $this->versions['preview'] = array('centeredpreview' => array($this->previewWidth, $this->previewHeight ));
+        if (!isset($this->versions['original']))
+            $this->versions['original'] = array();
+        if (!isset($this->versions['preview']))
+            $this->versions['preview'] = array('fit' => array($this->previewWidth, $this->previewHeight));
         $this->_imageId = $this->getImageId();
     }
 
@@ -110,12 +121,20 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         if ($id === null) {
             $id = $this->getImageId();
         }
-        return $id . '_' . $version . '.' . $this->extension;
+        return $version . '/' . $id . '.' . $this->extension;
     }
 
-    public function getUrl($version = '')
+    public function getUrl($version)
     {
-        return $this->url . '/' . $this->getFileName($version);
+        if (!$this->hasImage()) return null;
+        if (!empty($this->timeHash)) {
+            $time = filemtime($this->getFilePath($version));
+            $suffix = '?' . $this->timeHash . '=' . crc32($time);
+        } else {
+            $suffix = '';
+        }
+
+        return $this->url . '/' . $this->getFileName($version) . $suffix;
     }
 
     private function getFilePath($version)
@@ -124,7 +143,7 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
     }
 
     /**
-     * Removes all attached using this behavior
+     * Removes all images attached to model using this behavior
      */
     public function removeImages()
     {
@@ -139,6 +158,7 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
      */
     public function setImage($path)
     {
+        $this->checkDirectories();
         //create image preview for gallery manager
         foreach ($this->versions as $version => $actions) {
             /** @var Image $image */
@@ -158,7 +178,7 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
      */
     public function updateImages()
     {
-
+        $this->checkDirectories();
         foreach ($this->versions as $version => $actions)
             if ($version !== 'original') {
                 $this->removeFile($this->getFilePath($version));
@@ -182,11 +202,22 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
     {
         $pk = $this->owner->getPrimaryKey();
         if (is_array($pk)) {
-            sort($pk);
             return implode('_', $pk);
         } else {
             return $pk;
         }
     }
 
+    private function checkDirectory($path)
+    {
+        if (!file_exists($path))
+            mkdir($path, 0777);
+    }
+
+    private function checkDirectories()
+    {
+        foreach ($this->versions as $version => $actions) {
+            $this->checkDirectory($this->directory . '/' . $version);
+        }
+    }
 }

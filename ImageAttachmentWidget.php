@@ -14,15 +14,22 @@
  */
 class ImageAttachmentWidget extends CWidget
 {
+    /**
+     * Route to ImageAttachmentAction
+     * @var string
+     */
     public $apiRoute;
+
     public $assets;
 
     /**
+     * Behaviour name in model to use
      * @var string
      */
     public $behaviorName;
 
     /**
+     * Model with behaviour
      * @var CActiveRecord
      */
     public $model;
@@ -33,7 +40,6 @@ class ImageAttachmentWidget extends CWidget
     public function getBehavior()
     {
         return $this->model->{$this->behaviorName};
-
     }
 
     public function init()
@@ -54,6 +60,7 @@ class ImageAttachmentWidget extends CWidget
 
         if ($this->apiRoute === null)
             throw new CException('$apiRoute must be set.', 500);
+
 
         $options = array(
             'hasImage' => $this->behavior->hasImage(),

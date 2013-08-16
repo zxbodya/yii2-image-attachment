@@ -24,12 +24,16 @@
     display: none;
 }
 
+.imageAttachment .preview {
+    text-align: center;
+}
 .imageAttachment img {
     display: none;
+
 }
 
 .imageAttachment.with-image img {
-    display: block;
+    display: inline-block;
 }
 
 .imageAttachment .fileinput-button {

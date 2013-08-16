@@ -9,7 +9,7 @@
         <div class="preview"
              style="width: <?php echo $this->getBehavior()->previewWidth ?>px;
                  height: <?php echo $this->getBehavior()->previewHeight ?>px;">
-            <div class="no-image">Before image upload<br> save your page.</div>
+            <div class="no-image">Before image upload<br> save this.</div>
             <img/>
         </div>
     </div>
