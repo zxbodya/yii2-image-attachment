@@ -216,8 +216,28 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
 
     private function checkDirectories()
     {
+        if (!file_exists($this->directory)) {
+            $this->checkPath();
+        }
+
         foreach ($this->versions as $version => $actions) {
             $this->checkDirectory($this->directory . '/' . $version);
+        }
+    }
+
+    private function checkPath()
+    {
+        $parts = explode('/', $this->directory);
+        $i = 1;
+        $path = implode('/', array_splice(array_values($parts), 0, $i));
+        while (file_exists($path)) {
+            $i++;
+            $path = implode('/', array_splice(array_values($parts), 0, $i));
+        }
+        while ($i <= count($parts)) {
+            mkdir($path, 0777);
+            $i++;
+            $path = implode('/', array_splice(array_values($parts), 0, $i));
         }
     }
 }

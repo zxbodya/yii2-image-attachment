@@ -23,8 +23,8 @@
         var previewWrap = $('.preview', el);
         var previewImage = $('img', previewWrap);
         previewWrap.css({
-            'width': previewWidth + 'px',
-            'height': previewHeight + 'px'
+            'min-width': previewWidth + 'px',
+            'min-height': previewHeight + 'px'
         });
         if (hasImage) {
             updatePreview(previewUrl);

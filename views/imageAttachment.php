@@ -20,7 +20,7 @@
             <div class="no-image">No image</div>
             <img/>
         </div>
-        <div class="btn-toolbar">
+        <div class="btn-toolbar actions-bar">
         <span class="btn btn-success fileinput-button">
             <i class="icon-plus icon-white"></i> <span class="file_label">Upload…</span>
             <input type="file" name="image" class="afile" accept="image/*" multiple="multiple"/>
