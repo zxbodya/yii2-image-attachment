@@ -89,13 +89,13 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         $this->_imageId = $this->getImageId();
     }
 
-    protected function beforeDelete($event)
+    public function beforeDelete($event)
     {
         $this->removeImages();
         parent::beforeDelete($event);
     }
 
-    protected function afterSave($event)
+    public function afterSave($event)
     {
         $imageId = $this->getImageId();
         if ($this->_imageId != $imageId) {
