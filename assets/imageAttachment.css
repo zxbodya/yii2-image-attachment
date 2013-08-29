@@ -117,7 +117,9 @@
     height: 100%;
 }
 
-.imageAttachment .progress-overlay .modal {
+.imageAttachment .progress-overlay .progress-modal {
+    background-color: #efefef;
     position: relative;
-    top: 80px;
+    margin-top: 20%;
+    padding: 10px;
 }

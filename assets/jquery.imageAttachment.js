@@ -28,6 +28,8 @@
         });
         if (hasImage) {
             updatePreview(previewUrl);
+        } else {
+            $fileLabel.text($fileLabel.data('upload-text'));
         }
 
         function updatePreview(url) {
@@ -38,13 +40,12 @@
                 el.addClass('with-image');
                 previewImage.attr('src', previewUrl);
                 $removeImage.removeClass('disabled');
-                $fileLabel.text('Replace…');
-
+                $fileLabel.text($fileLabel.data('replace-text'));
             } else {
                 el.removeClass('with-image');
                 previewImage.removeAttr('src');
                 $removeImage.addClass('disabled');
-                $fileLabel.text('Upload…');
+                $fileLabel.text($fileLabel.data('upload-text'));
             }
         }
 

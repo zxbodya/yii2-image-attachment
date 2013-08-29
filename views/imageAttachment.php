@@ -9,7 +9,9 @@
         <div class="preview"
              style="width: <?php echo $this->getBehavior()->previewWidth ?>px;
                  height: <?php echo $this->getBehavior()->previewHeight ?>px;">
-            <div class="no-image">Before image upload<br> save this.</div>
+            <div class="no-image">
+                <?php echo Yii::t('ImageAttachmentWidget.main', 'Before image upload<br> save this.'); ?>
+            </div>
             <img/>
         </div>
     </div>
@@ -17,35 +19,36 @@
     <div class="imageAttachment" id="<?php echo $this->id ?>">
 
         <div class="preview">
-            <div class="no-image">No image</div>
+            <div class="no-image"><?php echo Yii::t('ImageAttachmentWidget.main', 'No image'); ?></div>
             <img/>
         </div>
         <div class="btn-toolbar actions-bar">
         <span class="btn btn-success fileinput-button">
-            <i class="icon-plus icon-white"></i> <span class="file_label">Upload…</span>
+            <i class="icon-upload icon-white"></i>
+            <span class="file_label"
+                  data-upload-text="<?php echo Yii::t('ImageAttachmentWidget.main', 'Upload…'); ?>"
+                  data-replace-text="<?php echo Yii::t('ImageAttachmentWidget.main', 'Replace…'); ?>">
+
+                  </span>
             <input type="file" name="image" class="afile" accept="image/*" multiple="multiple"/>
         </span>
 
         <span class="btn disabled remove_image">
-            <i class="icon-remove"></i> Remove</span>
+            <i class="icon-trash"></i> <?php echo Yii::t('ImageAttachmentWidget.main', 'Remove'); ?></span>
         </div>
         <div class="overlay">
             <div class="overlay-bg">&nbsp;</div>
             <div class="drop-hint">
-                <span class="drop-hint-info">Drop Image Here…</span>
+                <span class="drop-hint-info"><?php echo Yii::t('ImageAttachmentWidget.main', 'Drop Image Here…'); ?></span>
             </div>
         </div>
         <div class="progress-overlay">
             <div class="overlay-bg">&nbsp;</div>
-            <!-- Upload Progress Modal-->
-            <div class="modal progress-modal">
-                <div class="modal-header">
-                    <h3>Uploading image…</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="progress progress-striped active">
-                        <div class="bar upload-progress"></div>
-                    </div>
+            <div class="progress-modal">
+                <h3><?php echo Yii::t('ImageAttachmentWidget.main', 'Uploading image…'); ?></h3>
+
+                <div class="progress progress-striped active">
+                    <div class="bar upload-progress"></div>
                 </div>
             </div>
         </div>

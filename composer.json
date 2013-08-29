@@ -1,0 +1,18 @@
+{
+    "name": "z_bodya/yii-image-attachment",
+    "description": "Extension for yii, to handle images related to CActiveRecord",
+    "keywords": ["image", "behavior", "active record"],
+    "type": "yii-extension",
+    "license": "BSD-3-Clause",
+
+    "authors": [
+        {
+            "name": "Bogdan Savluk",
+            "email": "savluk.bogdan@gmail.com"
+        }
+    ],
+
+    "require": {
+        "z_bodya/yii-image": "*"
+    }
+}
