@@ -4,6 +4,9 @@ This extension intended to handle actions with images associated with model.
 
 Extensions provides user friendly widget, to upload and remove image.
 
+Screenshots:
+![Yii image attachement screenshots](http://zxbodya.cc.ua/scrup/4l/wicvwwi7c4cgw.png)
+
 ## Features
 
 1. Asynchronous image upload
@@ -14,7 +17,7 @@ Extensions provides user friendly widget, to upload and remove image.
 
 1. Yii
 2. Twitter bootstrap
-3. yii-image component (https://bitbucket.org/z_bodya/yii-image)
+3. [yii-image component](https://bitbucket.org/z_bodya/yii-image)
 
 ## Installation:
 
@@ -61,6 +64,7 @@ Extensions provides user friendly widget, to upload and remove image.
                 );
             }
         }
+        
 3. Add ImageAttachmentWidget somewhere in you application, for example in editing from.
 
         :::php
@@ -69,6 +73,7 @@ Extensions provides user friendly widget, to upload and remove image.
             'behaviorName' => 'previewImageAttachmentBehavior',
             'apiRoute' => 'api/saveImageAttachment',
         ));
+        
 4. It is done! You can use it now.
 
         :::php
@@ -76,19 +81,6 @@ Extensions provides user friendly widget, to upload and remove image.
             echo CHtml::image($model->preview->getUrl('medium'),'Medium image version');
         else
             echo 'no image uploaded';
-
-### More about image versions
-Each image version is separate file on server that was made from original
- using some manipulations thought [image component](https://bitbucket.org/z_bodya/yii-image).
-
-For example version:
-
-        :::php
-        array(
-           'resize' => array(200, null),
-        ),
-
-Actually means - original resized to 200px by width(image->resize(200,null)).
 
 ## Contributing
 
