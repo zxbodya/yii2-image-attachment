@@ -20,72 +20,73 @@ Extensions provides user friendly widget, to upload and remove image.
 
 0. Download and extract extension somewhere in your application(in this guide into extensions/imageAttachment).
 1. Add ImageAttachmentBehavior to you model, and configure it, create folder for uploaded files.
-```php
-public function behaviors()
-{
-    return array(
-        'previewImageAttachmentBehavior' => array(
-            'class' => 'ext.imageAttachment.ImageAttachmentBehavior',
-            // size for image preview in widget
-            'previewHeight' => 200,
-            'previewWidth' => 300,
-            // extension for image saving, can be also tiff, png or gif
-            'extension' => 'jpg',
-            // folder to store images
-            'directory' => Yii::getPathOfAlias('webroot').'/images/productTheme/preview',
-            // url for images folder
-            'url' => Yii::app()->request->baseUrl . '/images/productTheme/preview',
-            // image versions
-            'versions' => array(
-                'small' => array(
-                    'resize' => array(200, null),
-                ),
-                'medium' => array(
-                    'resize' => array(800, null),
+
+        :::php
+        public function behaviors()
+        {
+            return array(
+                'previewImageAttachmentBehavior' => array(
+                    'class' => 'ext.imageAttachment.ImageAttachmentBehavior',
+                    // size for image preview in widget
+                    'previewHeight' => 200,
+                    'previewWidth' => 300,
+                    // extension for image saving, can be also tiff, png or gif
+                    'extension' => 'jpg',
+                    // folder to store images
+                    'directory' => Yii::getPathOfAlias('webroot').'/images/productTheme/preview',
+                    // url for images folder
+                    'url' => Yii::app()->request->baseUrl . '/images/productTheme/preview',
+                    // image versions
+                    'versions' => array(
+                        'small' => array(
+                            'resize' => array(200, null),
+                        ),
+                        'medium' => array(
+                            'resize' => array(800, null),
+                        )
+                    )
                 )
-            )
-        )
-    );
-}
-```
+            );
+        }
+
 2. Add ImageAttachmentAction in controller somewhere in your application. Also on this step you can add some security checks for this action.
-```php
-class ApiController extends Controller
-{
-    public function actions()
-    {
-        return array(
-            'saveImageAttachment' => 'ext.imageAttachment.ImageAttachmentAction',
-        );
-    }
-}
-```
+
+        :::php
+        class ApiController extends Controller
+        {
+            public function actions()
+            {
+                return array(
+                    'saveImageAttachment' => 'ext.imageAttachment.ImageAttachmentAction',
+                );
+            }
+        }
 3. Add ImageAttachmentWidget somewhere in you application, for example in editing from.
-```php
-$this->widget('ext.imageAttachment.imageAttachmentWidget', array(
-    'model' => $model,
-    'behaviorName' => 'previewImageAttachmentBehavior',
-    'apiRoute' => 'api/saveImageAttachment',
-));
-```
+
+        :::php
+        $this->widget('ext.imageAttachment.imageAttachmentWidget', array(
+            'model' => $model,
+            'behaviorName' => 'previewImageAttachmentBehavior',
+            'apiRoute' => 'api/saveImageAttachment',
+        ));
 4. It is done! You can use it now.
-```php
-if($model->preview->hasImage())
-    echo CHtml::image($model->preview->getUrl('medium'),'Medium image version');
-else
-    echo 'no image uploaded';
-```
+
+        :::php
+        if($model->preview->hasImage())
+            echo CHtml::image($model->preview->getUrl('medium'),'Medium image version');
+        else
+            echo 'no image uploaded';
 
 ### More about image versions
 Each image version is separate file on server that was made from original
  using some manipulations thought [image component](https://bitbucket.org/z_bodya/yii-image).
 
 For example version:
-```php
- array(
-    'resize' => array(200, null),
- ),
-```
+
+        :::php
+        array(
+           'resize' => array(200, null),
+        ),
 
 Actually means - original resized to 200px by width(image->resize(200,null)).
 
