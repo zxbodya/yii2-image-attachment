@@ -21,7 +21,7 @@ Screenshots:
 
 ## Installation:
 
-0. Download and extract extension somewhere in your application(in this guide into extensions/imageAttachment).
+0. Download and extract extension somewhere in your application(in this guide into extensions/imageAttachment). Also available [in composer](https://packagist.org/packages/z_bodya/yii-image-attachment).
 1. Add ImageAttachmentBehavior to you model, and configure it, create folder for uploaded files.
 
         :::php
