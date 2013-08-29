@@ -22,6 +22,6 @@ return array(
     'No image' => '',
     'Remove' => '',
     'Replace…' => '',
-    'Uploading image…' => '',
+    'Uploading…' => '',
     'Upload…' => '',
 );

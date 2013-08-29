@@ -22,6 +22,6 @@ return array(
     'No image' => 'Нет картинки',
     'Remove' => 'Удалить',
     'Replace…' => 'Заменить',
-    'Uploading image…' => 'Картинка загружается…',
+    'Uploading…' => 'Загружается…',
     'Upload…' => 'Загрузить…',
 );

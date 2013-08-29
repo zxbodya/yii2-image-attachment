@@ -39,16 +39,19 @@
         <div class="overlay">
             <div class="overlay-bg">&nbsp;</div>
             <div class="drop-hint">
-                <span class="drop-hint-info"><?php echo Yii::t('ImageAttachmentWidget.main', 'Drop Image Here…'); ?></span>
+                <span
+                    class="drop-hint-info"><?php echo Yii::t('ImageAttachmentWidget.main', 'Drop Image Here…'); ?></span>
             </div>
         </div>
         <div class="progress-overlay">
             <div class="overlay-bg">&nbsp;</div>
             <div class="progress-modal">
-                <h3><?php echo Yii::t('ImageAttachmentWidget.main', 'Uploading image…'); ?></h3>
+                <div class="info">
+                    <h3><?php echo Yii::t('ImageAttachmentWidget.main', 'Uploading…'); ?></h3>
 
-                <div class="progress progress-striped active">
-                    <div class="bar upload-progress"></div>
+                    <div class="progress progress-striped active">
+                        <div class="bar upload-progress"></div>
+                    </div>
                 </div>
             </div>
         </div>
