@@ -28,7 +28,7 @@ Screenshots:
         public function behaviors()
         {
             return array(
-                'previewImageAttachmentBehavior' => array(
+                'preview' => array(
                     'class' => 'ext.imageAttachment.ImageAttachmentBehavior',
                     // size for image preview in widget
                     'previewHeight' => 200,
@@ -70,7 +70,7 @@ Screenshots:
         :::php
         $this->widget('ext.imageAttachment.imageAttachmentWidget', array(
             'model' => $model,
-            'behaviorName' => 'previewImageAttachmentBehavior',
+            'behaviorName' => 'preview',
             'apiRoute' => 'api/saveImageAttachment',
         ));
         
