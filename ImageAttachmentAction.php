@@ -17,8 +17,9 @@
  */
 class ImageAttachmentAction extends CAction
 {
-    public function run($model, $behavior, $id, $remove = false)
+    public function run($model, $behavior, $remove = false)
     {
+        $id = $_GET['id'];
         $model = CActiveRecord::model($model)->findByPk($id);
         if ($remove) {
             $model->{$behavior}->removeImages();

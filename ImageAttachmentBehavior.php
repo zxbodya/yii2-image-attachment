@@ -228,16 +228,22 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
     private function checkPath()
     {
         $parts = explode('/', $this->directory);
-        $i = 1;
-        $path = implode('/', array_splice(array_values($parts), 0, $i));
-        while (file_exists($path)) {
+        $i = 0;
+
+        $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+        while (!file_exists($path)) {
             $i++;
-            $path = implode('/', array_splice(array_values($parts), 0, $i));
+            $path = implode('/', array_slice($parts, 0, count($parts)-$i));
         }
-        while ($i <= count($parts)) {
+        $i--;
+        $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+        while ($i >= 0) {
             mkdir($path, 0777);
-            $i++;
-            $path = implode('/', array_splice(array_values($parts), 0, $i));
+            $i--;
+            $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+//            $t = array_values($parts);
+//            array_splice($t, count($parts)-$i, $i);
+//            $path = implode('/', $t);
         }
     }
 }
