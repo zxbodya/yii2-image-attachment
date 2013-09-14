@@ -4,7 +4,7 @@
  * ImageAttachmentBehavior.
  * @example
  *
- *   $this->widget('ext.imageAttachment.imageAttachmentWidget', array(
+ *   $this->widget('ext.imageAttachment.ImageAttachmentWidget', array(
  *       'model' => $model,
  *       'behaviorName' => 'previewImageAttachmentBehavior',
  *       'apiRoute' => 'api/saveImageAttachment',

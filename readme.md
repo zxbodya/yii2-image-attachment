@@ -68,7 +68,7 @@ Screenshots:
 3. Add ImageAttachmentWidget somewhere in you application, for example in editing from.
 
         :::php
-        $this->widget('ext.imageAttachment.imageAttachmentWidget', array(
+        $this->widget('ext.imageAttachment.ImageAttachmentWidget', array(
             'model' => $model,
             'behaviorName' => 'preview',
             'apiRoute' => 'api/saveImageAttachment',
