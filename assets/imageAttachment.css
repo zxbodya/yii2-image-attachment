@@ -29,6 +29,8 @@
 
 .imageAttachment .preview {
     text-align: center;
+    min-height: 140px;
+    min-width: 226px;
 }
 .imageAttachment img {
     display: none;
