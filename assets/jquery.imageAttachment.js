@@ -53,8 +53,8 @@
             if (hasImage) {
                 $.ajax({
                     type: 'POST',
-                    url: apiUrl + '&remove=true',
-                    data: (options.csrfToken ? '&' + options.csrfTokenName + '=' + options.csrfToken : ''),
+                    url: apiUrl,
+                    data: 'remove=true'+ (options.csrfToken ? '&' + options.csrfTokenName + '=' + options.csrfToken : ''),
                     dataType: "json"
                 }).done(function (data) {
                         hasImage = false;
