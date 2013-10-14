@@ -178,17 +178,20 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
      */
     public function updateImages()
     {
-        $this->checkDirectories();
-        foreach ($this->versions as $version => $actions)
-            if ($version !== 'original') {
-                $this->removeFile($this->getFilePath($version));
-                /** @var Image $image */
-                $image = Yii::app()->image->load($this->getFilePath('original'));
-                foreach ($actions as $method => $args) {
-                    call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
+        if ($this->hasImage()) {
+            $this->checkDirectories();
+            foreach ($this->versions as $version => $actions) {
+                if ($version !== 'original') {
+                    $this->removeFile($this->getFilePath($version));
+                    /** @var Image $image */
+                    $image = Yii::app()->image->load($this->getFilePath('original'));
+                    foreach ($actions as $method => $args) {
+                        call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
+                    }
+                    $image->save($this->getFilePath($version));
                 }
-                $image->save($this->getFilePath($version));
             }
+        }
     }
 
     private function removeFile($fileName)
@@ -230,17 +233,17 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         $parts = explode('/', $this->directory);
         $i = 0;
 
-        $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+        $path = implode('/', array_slice($parts, 0, count($parts) - $i));
         while (!file_exists($path)) {
             $i++;
-            $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+            $path = implode('/', array_slice($parts, 0, count($parts) - $i));
         }
         $i--;
-        $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+        $path = implode('/', array_slice($parts, 0, count($parts) - $i));
         while ($i >= 0) {
             mkdir($path, 0777);
             $i--;
-            $path = implode('/', array_slice($parts, 0, count($parts)-$i));
+            $path = implode('/', array_slice($parts, 0, count($parts) - $i));
 //            $t = array_values($parts);
 //            array_splice($t, count($parts)-$i, $i);
 //            $path = implode('/', $t);
