@@ -230,7 +230,7 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
 
     private function checkPath()
     {
-        $parts = explode('/', $this->directory);
+        $parts = explode('/', rtrim($this->directory,'/'));
         $i = 0;
 
         $path = implode('/', array_slice($parts, 0, count($parts) - $i));
