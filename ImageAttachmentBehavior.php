@@ -110,18 +110,21 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         parent::afterSave($event);
     }
 
-    public function hasImage()
+    public function hasImage($ext = null)
     {
-        $originalImage = $this->getFilePath('original');
+        $originalImage = $this->getFilePath('original', $ext);
         return file_exists($originalImage);
     }
 
-    private function getFileName($version = '', $id = null)
+    private function getFileName($version = '', $id = null, $ext = null)
     {
         if ($id === null) {
             $id = $this->getImageId();
         }
-        return $version . '/' . $id . '.' . $this->extension;
+        if ($ext === null) {
+            $ext = $this->extension;
+        }
+        return $version . '/' . $id . '.' . $ext;
     }
 
     public function getUrl($version)
@@ -137,18 +140,18 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         return $this->url . '/' . $this->getFileName($version) . $suffix;
     }
 
-    private function getFilePath($version)
+    public function getFilePath($version, $ext = null)
     {
-        return $this->directory . '/' . $this->getFileName($version);
+        return $this->directory . '/' . $this->getFileName($version, null, $ext);
     }
 
     /**
      * Removes all images attached to model using this behavior
      */
-    public function removeImages()
+    public function removeImages($ext = null)
     {
         foreach ($this->versions as $version => $actions) {
-            $this->removeFile($this->getFilePath($version));
+            $this->removeFile($this->getFilePath($version, $ext));
         }
     }
 
@@ -176,20 +179,23 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
      * Regenerate image versions
      * Should be called in migration on every model after changes in versions configuration
      */
-    public function updateImages()
+    public function updateImages($oldExt = null)
     {
-        if ($this->hasImage()) {
+        if ($this->hasImage($oldExt)) {
             $this->checkDirectories();
             foreach ($this->versions as $version => $actions) {
                 if ($version !== 'original') {
                     $this->removeFile($this->getFilePath($version));
                     /** @var Image $image */
-                    $image = Yii::app()->image->load($this->getFilePath('original'));
+                    $image = Yii::app()->image->load($this->getFilePath('original', $oldExt));
                     foreach ($actions as $method => $args) {
                         call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
                     }
                     $image->save($this->getFilePath($version));
                 }
+            }
+            if ($oldExt !== null) {
+                $this->removeImages($oldExt);
             }
         }
     }
