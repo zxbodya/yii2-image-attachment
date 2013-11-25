@@ -183,6 +183,10 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
     {
         if ($this->hasImage($oldExt)) {
             $this->checkDirectories();
+            if ($oldExt !== null) {
+                $image = Yii::app()->image->load($this->getFilePath('original', $oldExt));
+                $image->save($this->getFilePath('original'));
+            }
             foreach ($this->versions as $version => $actions) {
                 if ($version !== 'original') {
                     $this->removeFile($this->getFilePath($version));
@@ -236,7 +240,7 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
 
     private function checkPath()
     {
-        $parts = explode('/', rtrim($this->directory,'/'));
+        $parts = explode('/', rtrim($this->directory, '/'));
         $i = 0;
 
         $path = implode('/', array_slice($parts, 0, count($parts) - $i));
