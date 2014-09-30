@@ -1,30 +1,58 @@
 <?php
+namespace zxbodya\yii2\imageAttachment;
+
+use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
+use yii\base\Behavior;
+use yii\db\ActiveRecord;
+use yii\imagine\Image;
+
 /**
  * Behavior to handle image associated with model
  *
  * @example
- *      'previewImageAttachmentBehavior' => array(
- *          'class' => 'ext.imageAttachment.ImageAttachmentBehavior',
+ *      'coverBehavior' => [
+ *          'class' => ImageAttachmentBehavior::className(),
+ *          'type' => 'post',
  *          'previewHeight' => 200,
  *          'previewWidth' => 300,
  *          'extension' => 'jpg',
- *          'directory' => 'images/productTheme/preview',
- *          'url' => Yii::app()->request->baseUrl . '/images/productTheme/preview',
- *          'versions' => array(
- *              'small' => array(
- *                  'resize' => array(200, null),
- *              ),
- *              'medium' => array(
- *                  'resize' => array(800, null),
- *              )
- *          )
- *      )
+ *          'directory' => Yii::getAlias('@webroot') . '/images/post/cover',
+ *          'url' => Yii::getAlias('@web') . '/images/post/cover',
+ *          'versions' => [
+ *              'small' => function ($img) {
+ *                  return $img
+ *                      ->copy()
+ *                      ->resize($img->getSize()->widen(200));
+ *              },
+ *              'medium' => function ($img) {
+ *                  $dstSize = $img->getSize();
+ *                  $maxWidth = 800;
+ *                  if ($dstSize->getWidth() > $maxWidth) {
+ *                      $dstSize = $dstSize->widen($maxWidth);
+ *                  }
+ *                  return $img
+ *                      ->copy()
+ *                      ->resize($dstSize);
+ *              },
+ *          ]
+ *      ]
  *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
  *
+ *
  */
-class ImageAttachmentBehavior extends CActiveRecordBehavior
+class ImageAttachmentBehavior extends Behavior
 {
+    /**
+     * @var string Type name assigned to model in image attachment action
+     */
+    public $type;
+    /**
+     * @var ActiveRecord the owner of this behavior
+     */
+    public $owner;
+
     /**
      * Widget preview height
      * @var int
@@ -51,19 +79,23 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
      */
     public $url;
     /**
-     * @var array Settings for image auto-generation
-     * @note
-     * 'preview' & 'original' versions names are reserved for image preview in widget
-     * and original image files
+     * @var array Functions to generate image versions
+     * @note Be sure to not modify image passed to your version function,
+     *       because it will be reused in all other versions,
+     *       Before modification you should copy images as in examples below
+     * @note 'preview' & 'original' versions names are reserved for image preview in widget
+     *       and original image files, if it is required - you can override them
      * @example
-     *  array(
-     *       'small' => array(
-     *              'resize' => array(200, null),
-     *       ),
-     *      'medium' => array(
-     *              'resize' => array(800, null),
-     *      )
-     *  );
+     * [
+     *  'small' => function ($img) {
+     *      return $img
+     *          ->copy()
+     *          ->resize($img->getSize()->widen(200));
+     *  },
+     *  'medium' => function ($img) {
+     *      $dstSize = $img->getSize();
+     *      $maxWidth = 800;
+     * ]
      */
     public $versions;
 
@@ -77,26 +109,43 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
     private $_imageId;
 
     /**
-     * @param CComponent $owner
+     * @param ActiveRecord $owner
      */
     public function attach($owner)
     {
         parent::attach($owner);
-        if (!isset($this->versions['original']))
-            $this->versions['original'] = array();
-        if (!isset($this->versions['preview']))
-            $this->versions['preview'] = array('fit' => array($this->previewWidth, $this->previewHeight));
+        if (!isset($this->versions['original'])) {
+            $this->versions['original'] = function ($image) {
+                return $image;
+            };
+        }
+        if (!isset($this->versions['preview'])) {
+            $this->versions['preview'] = function ($originalImage) {
+                /** @var ImageInterface $originalImage */
+                return $originalImage
+                    ->thumbnail(new Box($this->previewWidth, $this->previewHeight));
+            };
+        }
         $this->_imageId = $this->getImageId();
     }
 
-    public function beforeDelete($event)
+    public function events()
     {
-        $this->removeImages();
-        parent::beforeDelete($event);
+        return [
+            ActiveRecord::EVENT_BEFORE_DELETE => 'beforeDelete',
+            ActiveRecord::EVENT_AFTER_UPDATE => 'afterUpdate',
+        ];
     }
 
-    public function afterSave($event)
+
+    public function beforeDelete()
     {
+        $this->removeImages();
+    }
+
+    public function afterUpdate()
+    {
+        // if primary key changes - move image
         $imageId = $this->getImageId();
         if ($this->_imageId != $imageId) {
             foreach ($this->versions as $version => $config) {
@@ -107,12 +156,13 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
                 }
             }
         }
-        parent::afterSave($event);
     }
+
 
     public function hasImage($ext = null)
     {
         $originalImage = $this->getFilePath('original', $ext);
+
         return file_exists($originalImage);
     }
 
@@ -124,12 +174,15 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         if ($ext === null) {
             $ext = $this->extension;
         }
-        return $version . '/' . $id . '.' . $ext;
+
+        return $id . '/' . $version . '.' . $ext;
     }
 
     public function getUrl($version)
     {
-        if (!$this->hasImage()) return null;
+        if (!$this->hasImage()) {
+            return null;
+        }
         if (!empty($this->timeHash)) {
             $time = filemtime($this->getFilePath($version));
             $suffix = '?' . $this->timeHash . '=' . crc32($time);
@@ -147,30 +200,34 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
 
     /**
      * Removes all images attached to model using this behavior
+     *
+     * @param null $ext
      */
     public function removeImages($ext = null)
     {
-        foreach ($this->versions as $version => $actions) {
+        foreach ($this->versions as $version => $fn) {
             $this->removeFile($this->getFilePath($version, $ext));
         }
     }
 
     /**
      * Replace existing image by specified file
+     *
      * @param $path
      */
     public function setImage($path)
     {
         $this->checkDirectories();
-        //create image preview for gallery manager
-        foreach ($this->versions as $version => $actions) {
-            /** @var Image $image */
-            $image = Yii::app()->image->load($path);
 
-            foreach ($actions as $method => $args) {
-                call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
-            }
-            $image->save($this->getFilePath($version));
+        $originalImage = Image::getImagine()->open($path);
+        //save image in original size
+
+        //create image preview for gallery manager
+        foreach ($this->versions as $version => $fn) {
+            /** @var Image $image */
+
+            call_user_func($fn, $originalImage)
+                ->save($this->getFilePath($version));
         }
     }
 
@@ -184,30 +241,27 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
         if ($this->hasImage($oldExt)) {
             $this->checkDirectories();
             if ($oldExt !== null) {
-                $image = Yii::app()->image->load($this->getFilePath('original', $oldExt));
-                $image->save($this->getFilePath('original'));
+                $originalImage = Image::getImagine()->open($this->getFilePath('original', $oldExt));
+                $originalImage->save($this->getFilePath('original'));
+                $this->removeImages($oldExt);
+            } else {
+                $originalImage = Image::getImagine()->open($this->getFilePath('original'));
             }
-            foreach ($this->versions as $version => $actions) {
+            foreach ($this->versions as $version => $fn) {
                 if ($version !== 'original') {
                     $this->removeFile($this->getFilePath($version));
-                    /** @var Image $image */
-                    $image = Yii::app()->image->load($this->getFilePath('original', $oldExt));
-                    foreach ($actions as $method => $args) {
-                        call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
-                    }
-                    $image->save($this->getFilePath($version));
+                    call_user_func($fn, $originalImage)
+                        ->save($this->getFilePath($version));
                 }
-            }
-            if ($oldExt !== null) {
-                $this->removeImages($oldExt);
             }
         }
     }
 
     private function removeFile($fileName)
     {
-        if (file_exists($fileName))
+        if (file_exists($fileName)) {
             @unlink($fileName);
+        }
     }
 
 
@@ -223,8 +277,9 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
 
     private function checkDirectory($path)
     {
-        if (!file_exists($path))
+        if (!file_exists($path)) {
             mkdir($path, 0777);
+        }
     }
 
     private function checkDirectories()
@@ -233,9 +288,7 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
             $this->checkPath();
         }
 
-        foreach ($this->versions as $version => $actions) {
-            $this->checkDirectory($this->directory . '/' . $version);
-        }
+        $this->checkDirectory($this->directory . '/' . $this->getImageId());
     }
 
     private function checkPath()
@@ -254,9 +307,6 @@ class ImageAttachmentBehavior extends CActiveRecordBehavior
             mkdir($path, 0777);
             $i--;
             $path = implode('/', array_slice($parts, 0, count($parts) - $i));
-//            $t = array_values($parts);
-//            array_splice($t, count($parts)-$i, $i);
-//            $path = implode('/', $t);
         }
     }
 }

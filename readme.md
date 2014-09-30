@@ -1,11 +1,11 @@
 # ImageAttachment
 
-This extension intended to handle actions with images associated with model.
+This extension intended to handle images associated with model.
 
-Extensions provides user friendly widget, to upload and remove image.
+Extensions provides user friendly widget, for image upload and removal.
 
 Screenshots:
-![Yii image attachement screenshots](http://zxbodya.cc.ua/scrup/4l/wicvwwi7c4cgw.png)
+![Yii2 image attachement screenshot](http://zxbodya.cc.ua/scrup/90/oycab5bcw0gwc.png)
 
 ## Features
 
@@ -15,74 +15,103 @@ Screenshots:
 
 ## Decencies
 
-1. Yii
-2. Twitter bootstrap
-3. [yii-image component](https://bitbucket.org/z_bodya/yii-image)
+1. Yii2
+2. Twitter bootstrap assets
+3. Imagine library
 
 ## Installation:
+The preferred way to install this extension is through [composer](https://getcomposer.org/).
 
-0. Download and extract extension somewhere in your application(in this guide into extensions/imageAttachment). Also available [in composer](https://packagist.org/packages/z_bodya/yii-image-attachment).
-1. Add ImageAttachmentBehavior to you model, and configure it, create folder for uploaded files.
+Either run
 
-        :::php
-        public function behaviors()
-        {
-            return array(
-                'preview' => array(
-                    'class' => 'ext.imageAttachment.ImageAttachmentBehavior',
-                    // size for image preview in widget
-                    'previewHeight' => 200,
-                    'previewWidth' => 300,
-                    // extension for image saving, can be also tiff, png or gif
-                    'extension' => 'jpg',
-                    // folder to store images
-                    'directory' => Yii::getPathOfAlias('webroot').'/images/productTheme/preview',
-                    // url for images folder
-                    'url' => Yii::app()->request->baseUrl . '/images/productTheme/preview',
-                    // image versions
-                    'versions' => array(
-                        'small' => array(
-                            'resize' => array(200, null),
-                        ),
-                        'medium' => array(
-                            'resize' => array(800, null),
-                        )
-                    )
-                )
-            );
-        }
+`php composer.phar require --prefer-dist zxbodya/yii2-image-attachment "*@dev"`
+
+or add
+
+`"zxbodya/yii2-image-attachment": "*@dev"`
+
+to the require section of your `composer.json` file.
+
+## Usage
+
+1. Add ImageAttachmentBehavior to your model, and configure it, create folder for uploaded files.
+
+```php
+public function behaviors()
+{
+    return [
+        TimestampBehavior::className(),
+        'coverBehavior' => [
+            'class' => ImageAttachmentBehavior::className(),
+            // type name for model
+            'type' => 'post',
+            // image dimmentions for preview in widget 
+            'previewHeight' => 200,
+            'previewWidth' => 300,
+            // extension for images saving
+            'extension' => 'jpg',
+            // path to location where to save images
+            'directory' => Yii::getAlias('@webroot') . '/images/post/cover',
+            'url' => Yii::getAlias('@web') . '/images/post/cover',
+            // additional image versions
+            'versions' => [
+                'small' => function ($img) {
+                    /** @var ImageInterface $img */
+                    return $img
+                        ->copy()
+                        ->resize($img->getSize()->widen(200));
+                },
+                'medium' => function ($img) {
+                    /** @var ImageInterface $img */
+                    $dstSize = $img->getSize();
+                    $maxWidth = 800;
+                    if ($dstSize->getWidth() > $maxWidth) {
+                        $dstSize = $dstSize->widen($maxWidth);
+                    }
+                    return $img
+                        ->copy()
+                        ->resize($dstSize);
+                },
+            ]
+        ]
+    ];
+}
+```
+
 
 2. Add ImageAttachmentAction in controller somewhere in your application. Also on this step you can add some security checks for this action.
 
-        :::php
-        class ApiController extends Controller
-        {
-            public function actions()
-            {
-                return array(
-                    'saveImageAttachment' => 'ext.imageAttachment.ImageAttachmentAction',
-                );
-            }
-        }
+```php
+public function actions()
+{
+    return [
+        'imgAttachApi' => [
+            'class' => ImageAttachmentAction::className(),
+            // mappings between type names and model classes (should be the same as in behaviour)
+            'types' => [
+                'post' => Post::className()
+            ]
+        ],
+    ];
+}
+```
         
 3. Add ImageAttachmentWidget somewhere in you application, for example in editing from.
 
-        :::php
-        $this->widget('ext.imageAttachment.ImageAttachmentWidget', array(
-            'model' => $model,
-            'behaviorName' => 'preview',
-            'apiRoute' => 'api/saveImageAttachment',
-        ));
+```php
+echo ImageAttachmentWidget::widget(
+    [
+        'model' => $model,
+        'behaviorName' => 'coverBehavior',
+        'apiRoute' => 'test/imgAttachApi',
+    ]
+)
+```
         
-4. It is done! You can use it now.
+4. Done! Now, you can use it in other places in app too:
 
-        :::php
-        if($model->preview->hasImage())
-            echo CHtml::image($model->preview->getUrl('medium'),'Medium image version');
-        else
-            echo 'no image uploaded';
-
-## Contributing
-
-Pull requests are welcome!
-Also, if you any ideas or questions about - welcome to [issue tracker](https://bitbucket.org/z_bodya/yii-image-attachment/issues)
+```php
+if ($model->getBehavior('coverBehavior')->hasImage()) {
+    echo Html::img($model->getBehavior('coverBehavior')->getUrl('medium'));
+}
+```

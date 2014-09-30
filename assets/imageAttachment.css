@@ -9,7 +9,9 @@
   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075); }
   .imageAttachment .actions-bar {
-    margin: 0; }
+    margin: 0;
+    padding-top: 4px;
+    padding-bottom: 4px; }
   .imageAttachment .no-image {
     color: #777;
     font-weight: bold;
@@ -28,24 +30,23 @@
     display: none; }
   .imageAttachment.with-image img {
     display: inline-block; }
-  .imageAttachment .fileinput-button {
+  .imageAttachment .btn-file {
     position: relative;
-    overflow: hidden;
-    margin-left: 8px;
-    margin-top: 4px;
-    margin-bottom: 4px; }
-    .imageAttachment .fileinput-button input {
-      position: absolute;
-      top: 0;
-      right: 0;
-      margin: 0;
-      transform: translate(-300px, 0) scale(4);
-      font-size: 23px;
-      opacity: 0;
-      filter: alpha(opacity=0);
-      -moz-transform: translate(-300px, 0) scale(4);
-      direction: ltr;
-      cursor: pointer; }
+    overflow: hidden; }
+  .imageAttachment .btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 999px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block; }
   .imageAttachment .overlay {
     display: none;
     position: absolute;

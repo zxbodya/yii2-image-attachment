@@ -1,4 +1,13 @@
 <?php
+namespace zxbodya\yii2\imageAttachment;
+
+use Yii;
+use yii\base\Exception;
+use yii\base\Widget;
+use yii\db\ActiveRecord;
+use yii\helpers\Json;
+use yii\helpers\Url;
+
 /**
  * Widget to provide interface for image upload to models with
  * ImageAttachmentBehavior.
@@ -12,7 +21,7 @@
  *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
  */
-class ImageAttachmentWidget extends CWidget
+class ImageAttachmentWidget extends Widget
 {
     /**
      * Route to ImageAttachmentAction
@@ -30,7 +39,7 @@ class ImageAttachmentWidget extends CWidget
 
     /**
      * Model with behaviour
-     * @var CActiveRecord
+     * @var ActiveRecord
      */
     public $model;
 
@@ -39,56 +48,57 @@ class ImageAttachmentWidget extends CWidget
      */
     public function getBehavior()
     {
-        return $this->model->{$this->behaviorName};
+        return $this->model->getBehavior($this->behaviorName);
     }
+
 
     public function init()
     {
-        $this->assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
+        parent::init();
+        $this->registerTranslations();
+    }
+
+    public function registerTranslations()
+    {
+        $i18n = Yii::$app->i18n;
+        $i18n->translations['imageAttachment/*'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'sourceLanguage' => 'en-US',
+            'basePath' => '@zxbodya/yii2/imageAttachment/messages',
+            'fileMap' => [
+            ],
+        ];
     }
 
     public function run()
     {
-        /** @var $cs CClientScript */
-        $cs = Yii::app()->clientScript;
-        $cs->registerCssFile($this->assets . '/imageAttachment.css');
-
-        $cs->registerCoreScript('jquery');
-
-        if(YII_DEBUG) {
-            $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.js');
-            $cs->registerScriptFile($this->assets . '/jquery.imageAttachment.js');
-        } else {
-            $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.min.js');
-            $cs->registerScriptFile($this->assets . '/jquery.imageAttachment.min.js');
+        if ($this->apiRoute === null) {
+            throw new Exception('$apiRoute must be set.', 500);
         }
 
-        if ($this->apiRoute === null)
-            throw new CException('$apiRoute must be set.', 500);
 
-
-        $options = array(
+        $options = [
             'hasImage' => $this->behavior->hasImage(),
             'previewUrl' => $this->behavior->getUrl('preview'),
             'previewWidth' => $this->behavior->previewWidth,
             'previewHeight' => $this->behavior->previewHeight,
-            'apiUrl' => $this->getController()->createUrl($this->apiRoute, array(
-                'model' => get_class($this->behavior->owner),
-                'behavior' => $this->behaviorName,
-                'id' => $this->behavior->owner->getPrimaryKey(),
-            ))
-        );
+            'apiUrl' => Url::to(
+                [
+                    $this->apiRoute,
+                    'type' => $this->behavior->type,
+                    'behavior' => $this->behaviorName,
+                    'id' => $this->behavior->owner->getPrimaryKey(),
+                ]
+            ),
+        ];
 
-        if (Yii::app()->request->enableCsrfValidation) {
-            $options['csrfTokenName'] = Yii::app()->request->csrfTokenName;
-            $options['csrfToken'] = Yii::app()->request->csrfToken;
-        }
+        $optionsJS = Json::encode($options);
 
-        $optionsJS = CJavaScript::encode($options);
-        $cs->registerScript('imageAttachment#' . $this->id, "$('#{$this->id}').imageAttachment({$optionsJS});");
+        $view = $this->getView();
+        ImageAttachmentAsset::register($view);
+        $view->registerJs("$('#{$this->id}').imageAttachment({$optionsJS});");
 
-        $this->render('imageAttachment');
+        return $this->render('imageAttachment');
     }
-
 
 }

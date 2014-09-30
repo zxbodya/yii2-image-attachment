@@ -15,6 +15,10 @@
     var $removeImage = $('.remove_image', el);
     var $fileLabel = $('.file_label', el);
 
+
+    options.csrfToken = options.csrfToken || $('meta[name=csrf-token]').attr('content');
+    options.csrfTokenName = options.csrfTokenName || $('meta[name=csrf-param]').attr('content');
+
     var hasImage = options.hasImage || false;
     var apiUrl = options.apiUrl || '';
     var previewUrl = options.previewUrl || '';
@@ -91,6 +95,7 @@
               // exception !!!
               console.log(this.response);
             }
+
             $uploadProgress.css('width', '100%');
             $progressOverlay.hide();
 
