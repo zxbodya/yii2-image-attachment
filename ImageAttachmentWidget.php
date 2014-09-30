@@ -55,8 +55,13 @@ class ImageAttachmentWidget extends CWidget
 
         $cs->registerCoreScript('jquery');
 
-        $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.js');
-        $cs->registerScriptFile($this->assets . '/jquery.imageAttachment.js');
+        if(YII_DEBUG) {
+            $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.js');
+            $cs->registerScriptFile($this->assets . '/jquery.imageAttachment.js');
+        } else {
+            $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.min.js');
+            $cs->registerScriptFile($this->assets . '/jquery.imageAttachment.min.js');
+        }
 
         if ($this->apiRoute === null)
             throw new CException('$apiRoute must be set.', 500);
