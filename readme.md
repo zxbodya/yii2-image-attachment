@@ -4,7 +4,6 @@ This extension intended to handle images associated with model.
 
 Extensions provides user friendly widget, for image upload and removal.
 
-Screenshots:
 ![Yii2 image attachement screenshot](http://zxbodya.cc.ua/scrup/90/oycab5bcw0gwc.png)
 
 ## Features
@@ -34,7 +33,7 @@ to the require section of your `composer.json` file.
 
 ## Usage
 
-1. Add ImageAttachmentBehavior to your model, and configure it, create folder for uploaded files.
+Add ImageAttachmentBehavior to your model, and configure it, create folder for uploaded files.
 
 ```php
 public function behaviors()
@@ -79,7 +78,7 @@ public function behaviors()
 ```
 
 
-2. Add ImageAttachmentAction in controller somewhere in your application. Also on this step you can add some security checks for this action.
+Add ImageAttachmentAction in controller somewhere in your application. Also on this step you can add some security checks for this action.
 
 ```php
 public function actions()
@@ -96,7 +95,7 @@ public function actions()
 }
 ```
         
-3. Add ImageAttachmentWidget somewhere in you application, for example in editing from.
+Add ImageAttachmentWidget somewhere in you application, for example in editing from.
 
 ```php
 echo ImageAttachmentWidget::widget(
@@ -108,7 +107,7 @@ echo ImageAttachmentWidget::widget(
 )
 ```
         
-4. Done! Now, you can use it in other places in app too:
+Done! Now, you can use it in other places in app too:
 
 ```php
 if ($model->getBehavior('coverBehavior')->hasImage()) {
