@@ -126,7 +126,6 @@ class ImageAttachmentBehavior extends Behavior
                     ->thumbnail(new Box($this->previewWidth, $this->previewHeight));
             };
         }
-        $this->_imageId = $this->getImageId();
     }
 
     public function events()
@@ -134,6 +133,7 @@ class ImageAttachmentBehavior extends Behavior
         return [
             ActiveRecord::EVENT_BEFORE_DELETE => 'beforeDelete',
             ActiveRecord::EVENT_AFTER_UPDATE => 'afterUpdate',
+            ActiveRecord::EVENT_AFTER_FIND => 'afterFind',
         ];
     }
 
@@ -141,6 +141,11 @@ class ImageAttachmentBehavior extends Behavior
     public function beforeDelete()
     {
         $this->removeImages();
+    }
+
+    public function afterFind()
+    {
+        $this->_imageId = $this->getImageId();
     }
 
     public function afterUpdate()
@@ -161,7 +166,7 @@ class ImageAttachmentBehavior extends Behavior
 
     public function hasImage($ext = null)
     {
-        $originalImage = $this->getFilePath('original', $ext);
+        $originalImage = $this->getFilePath('original', null, $ext);
 
         return file_exists($originalImage);
     }
@@ -193,9 +198,9 @@ class ImageAttachmentBehavior extends Behavior
         return $this->url . '/' . $this->getFileName($version) . $suffix;
     }
 
-    public function getFilePath($version, $ext = null)
+    public function getFilePath($version, $id = null, $ext = null)
     {
-        return $this->directory . '/' . $this->getFileName($version, null, $ext);
+        return $this->directory . '/' . $this->getFileName($version, $id, $ext);
     }
 
     /**
@@ -206,7 +211,7 @@ class ImageAttachmentBehavior extends Behavior
     public function removeImages($ext = null)
     {
         foreach ($this->versions as $version => $fn) {
-            $this->removeFile($this->getFilePath($version, $ext));
+            $this->removeFile($this->getFilePath($version, null, $ext));
         }
     }
 
@@ -235,13 +240,15 @@ class ImageAttachmentBehavior extends Behavior
     /**
      * Regenerate image versions
      * Should be called in migration on every model after changes in versions configuration
+     *
+     * @param string|null $oldExt
      */
     public function updateImages($oldExt = null)
     {
         if ($this->hasImage($oldExt)) {
             $this->checkDirectories();
             if ($oldExt !== null) {
-                $originalImage = Image::getImagine()->open($this->getFilePath('original', $oldExt));
+                $originalImage = Image::getImagine()->open($this->getFilePath('original', null, $oldExt));
                 $originalImage->save($this->getFilePath('original'));
                 $this->removeImages($oldExt);
             } else {
