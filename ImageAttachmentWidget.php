@@ -46,7 +46,7 @@ class ImageAttachmentWidget extends Widget
     /**
      * @return ImageAttachmentBehavior
      */
-    public function getBehavior()
+    public function getAttachmentBehavior()
     {
         return $this->model->getBehavior($this->behaviorName);
     }
@@ -77,17 +77,18 @@ class ImageAttachmentWidget extends Widget
         }
 
 
+        $attachmentBehavior = $this->getAttachmentBehavior();
         $options = [
-            'hasImage' => $this->behavior->hasImage(),
-            'previewUrl' => $this->behavior->getUrl('preview'),
-            'previewWidth' => $this->behavior->previewWidth,
-            'previewHeight' => $this->behavior->previewHeight,
+            'hasImage' => $attachmentBehavior->hasImage(),
+            'previewUrl' => $attachmentBehavior->getUrl('preview'),
+            'previewWidth' => $attachmentBehavior->previewWidth,
+            'previewHeight' => $attachmentBehavior->previewHeight,
             'apiUrl' => Url::to(
                 [
                     $this->apiRoute,
-                    'type' => $this->behavior->type,
+                    'type' => $attachmentBehavior->type,
                     'behavior' => $this->behaviorName,
-                    'id' => $this->behavior->owner->getPrimaryKey(),
+                    'id' => $attachmentBehavior->owner->getPrimaryKey(),
                 ]
             ),
         ];

@@ -3,13 +3,17 @@
  * @var View $this
  */
 use yii\web\View;
+use zxbodya\yii2\imageAttachment\ImageAttachmentWidget;
 
+/** @var ImageAttachmentWidget $widget */
+$widget = $this->context;
 ?>
-<?php if ($this->context->model->isNewRecord): ?>
+<?php
+if ($widget->model->isNewRecord): ?>
     <div class="imageAttachment">
         <div class="preview"
-             style="width: <?php echo $this->context->getBehavior()->previewWidth ?>px;
-                 height: <?php echo $this->context->getBehavior()->previewHeight ?>px;">
+             style="width: <?php echo $widget->getAttachmentBehavior()->previewWidth ?>px;
+                 height: <?php echo $widget->getAttachmentBehavior()->previewHeight ?>px;">
             <div class="no-image">
                 <?php echo Yii::t('imageAttachment/main', 'Before image upload<br> save this.'); ?>
             </div>
@@ -17,7 +21,7 @@ use yii\web\View;
         </div>
     </div>
 <?php else: ?>
-    <div class="imageAttachment" id="<?php echo $this->context->id ?>">
+    <div class="imageAttachment" id="<?php echo $widget->id ?>">
 
         <div class="preview">
             <div class="no-image"><?php echo Yii::t('imageAttachment/main', 'No image'); ?></div>
