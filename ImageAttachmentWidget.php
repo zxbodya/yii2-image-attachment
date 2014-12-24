@@ -46,7 +46,7 @@ class ImageAttachmentWidget extends Widget
     /**
      * @return ImageAttachmentBehavior
      */
-    public function getBehavior()
+    public function getBehavior($name=null)
     {
         return $this->model->getBehavior($this->behaviorName);
     }
