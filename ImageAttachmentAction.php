@@ -1,12 +1,10 @@
 <?php
 namespace zxbodya\yii2\imageAttachment;
 
-use Imagine\Image\Box;
 use Yii;
 use yii\base\Action;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
-use yii\imagine\Image;
 use yii\web\BadRequestHttpException;
 use yii\web\UploadedFile;
 
@@ -29,6 +27,12 @@ use yii\web\UploadedFile;
 class ImageAttachmentAction extends Action
 {
     /**
+     * Glue used to implode composite primary keys
+     * @var string
+     */
+    public $pkGlue = '_';
+
+    /**
      * @var array Mapping between types and model class names
      */
     public $types = [];
@@ -37,11 +41,15 @@ class ImageAttachmentAction extends Action
     {
         $remove = Yii::$app->request->post('remove', false);
 
-        if(!isset($this->types[$type])){
+        if (!isset($this->types[$type])) {
             throw new BadRequestHttpException('Specified model not found');
         }
         /** @var ActiveRecord $targetModel */
-        $targetModel = call_user_func([$this->types[$type], 'findOne'], ['id' => $id]);
+        $pkNames = call_user_func([$this->types[$type], 'primaryKey']);
+        $pkValues = explode($this->pkGlue, $id);
+
+        $pk = array_combine($pkNames, $pkValues);
+        $targetModel = call_user_func([$this->types[$type], 'findOne'], $pk);
 
         /** @var ImageAttachmentBehavior $behavior */
         $behavior = $targetModel->getBehavior($behavior);

@@ -45,6 +45,11 @@ use yii\imagine\Image;
 class ImageAttachmentBehavior extends Behavior
 {
     /**
+     * Glue used to implode composite primary keys
+     * @var string
+     */
+    public $pkGlue = '_';
+    /**
      * @var string Type name assigned to model in image attachment action
      */
     public $type;
@@ -272,11 +277,11 @@ class ImageAttachmentBehavior extends Behavior
     }
 
 
-    private function getImageId()
+    public function getImageId()
     {
         $pk = $this->owner->getPrimaryKey();
         if (is_array($pk)) {
-            return implode('_', $pk);
+            return implode($this->pkGlue, $pk);
         } else {
             return $pk;
         }

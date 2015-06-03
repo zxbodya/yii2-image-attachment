@@ -88,7 +88,7 @@ class ImageAttachmentWidget extends Widget
                     $this->apiRoute,
                     'type' => $attachmentBehavior->type,
                     'behavior' => $this->behaviorName,
-                    'id' => $attachmentBehavior->owner->getPrimaryKey(),
+                    'id' => $attachmentBehavior->getImageId(),
                 ]
             ),
         ];
