@@ -234,10 +234,17 @@ class ImageAttachmentBehavior extends Behavior
 
         //create image preview for gallery manager
         foreach ($this->versions as $version => $fn) {
-            /** @var Image $image */
+            /** @var ImageInterface $image */
 
-            call_user_func($fn, $originalImage)
-                ->save($this->getFilePath($version));
+            $image = call_user_func($fn, $originalImage);
+            if (is_array($image)) {
+                list($image, $options) = $image;
+            } else {
+                $options = [];
+            }
+
+            $image->save($this->getFilePath($version), $options);
+
         }
     }
 
@@ -262,8 +269,16 @@ class ImageAttachmentBehavior extends Behavior
             foreach ($this->versions as $version => $fn) {
                 if ($version !== 'original') {
                     $this->removeFile($this->getFilePath($version));
-                    call_user_func($fn, $originalImage)
-                        ->save($this->getFilePath($version));
+                    /** @var ImageInterface $image */
+
+                    $image = call_user_func($fn, $originalImage);
+                    if (is_array($image)) {
+                        list($image, $options) = $image;
+                    } else {
+                        $options = [];
+                    }
+
+                    $image->save($this->getFilePath($version), $options);
                 }
             }
         }
