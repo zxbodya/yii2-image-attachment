@@ -67,9 +67,10 @@ public function behaviors()
                     if ($dstSize->getWidth() > $maxWidth) {
                         $dstSize = $dstSize->widen($maxWidth);
                     }
-                    return $img
-                        ->copy()
-                        ->resize($dstSize);
+                    return [
+                        $img->copy()->resize($dstSize),
+                        ['jpeg_quality' => 80], // options used when saving image (Imagine::save)
+                    ];
                 },
             ]
         ]
