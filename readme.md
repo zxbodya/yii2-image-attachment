@@ -47,6 +47,8 @@ public function behaviors()
             // image dimmentions for preview in widget 
             'previewHeight' => 200,
             'previewWidth' => 300,
+            // image driver. Available values: 'gd2', 'imagick', 'gmagick'
+            'driver' => 'gd2',
             // extension for images saving
             'extension' => 'jpg',
             // path to location where to save images

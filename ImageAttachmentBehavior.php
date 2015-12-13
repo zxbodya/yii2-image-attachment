@@ -79,6 +79,11 @@ class ImageAttachmentBehavior extends Behavior
      */
     public $directory;
     /**
+     * The image driver to use.
+     * @var string
+     */
+    public $driver = 'gmagick';
+    /**
      * Directory Url, without trailing slash
      * @var string
      */
@@ -228,6 +233,13 @@ class ImageAttachmentBehavior extends Behavior
     public function setImage($path)
     {
         $this->checkDirectories();
+
+        // set driver for Image
+        if (in_array($this->driver, (array) Image::$driver)) {
+            Image::$driver = $this->driver;
+        } else {
+            throw new InvalidConfigException("Unknown driver: $this->driver");
+        }
 
         $originalImage = Image::getImagine()->open($path);
         //save image in original size
