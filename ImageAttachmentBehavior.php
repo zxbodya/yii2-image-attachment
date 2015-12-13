@@ -82,7 +82,7 @@ class ImageAttachmentBehavior extends Behavior
      * The image driver to use.
      * @var string
      */
-    public $driver = 'gmagick';
+    public $driver = 'gd2';
     /**
      * Directory Url, without trailing slash
      * @var string
