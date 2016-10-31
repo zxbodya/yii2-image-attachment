@@ -69,7 +69,7 @@ public function behaviors()
                     }
                     return [
                         $img->copy()->resize($dstSize),
-                        ['jpeg_quality' => 80], // options used when saving image (Imagine::save)
+                        ['quality' => 80], // options used when saving image (Imagine::save)
                     ];
                 },
             ]
