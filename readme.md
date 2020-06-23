@@ -39,7 +39,6 @@ Add ImageAttachmentBehavior to your model, and configure it, create folder for u
 public function behaviors()
 {
     return [
-        TimestampBehavior::className(),
         'coverBehavior' => [
             'class' => ImageAttachmentBehavior::className(),
             // type name for model
