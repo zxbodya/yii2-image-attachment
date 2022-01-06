@@ -26,8 +26,7 @@ class ImageAttachmentAsset extends AssetBundle
         'imageAttachment.css'
     ];
     public $depends = [
-        'yii\web\JqueryAsset',
-        'yii\bootstrap\BootstrapAsset',
+        'yii\web\JqueryAsset'
     ];
 
 }
